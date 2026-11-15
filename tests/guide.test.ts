@@ -32,3 +32,11 @@ test("all build steps point to available diagrams and the three circuits use six
   assert.equal(new Set(syringes).size, 6);
   assert.ok(GUIDE.materials.find((material) => material.id === "syringes")?.quantity.includes("6"));
 });
+
+test("the gripper has one fixed finger and one hydraulic finger pivoting at P3", () => {
+  const gripper = GUIDE.parts.find((part) => part.id === "G1");
+  assert.match(gripper?.description ?? "", /one fixed, one moving/i);
+  assert.match(GUIDE.parts.find((part) => part.id === "P3")?.description ?? "", /moving G1 finger/i);
+  assert.match(GUIDE.steps.find((step) => step.id === "step-05")?.expected ?? "", /other finger stays fixed/i);
+  assert.match(GUIDE.steps.find((step) => step.id === "step-07")?.expected ?? "", /other jaw stays fixed/i);
+});

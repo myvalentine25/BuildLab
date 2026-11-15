@@ -13,7 +13,7 @@ BuildLab is a bilingual (Vietnamese-first) learning workspace for building a **h
 - English and Vietnamese interface and project steps; Vietnamese is the default.
 - Print-friendly guide and project report.
 
-The model has **three manual movements**: shoulder raise/lower (C1), elbow bend/straighten (C2), and gripper open/close (C3). Its base does not rotate. It has no motors, electronics, or autonomous control.
+The model has **three manual movements**: shoulder raise/lower (C1), elbow bend/straighten (C2), and gripper open/close (C3). The gripper has one finger fixed to the forearm and one finger that pivots at P3 under C3 control. Its base does not rotate. It has no motors, electronics, or autonomous control.
 
 ## Local setup
 
@@ -35,7 +35,7 @@ Open [http://localhost:3000](http://localhost:3000). Leaving `TUTOR_API_KEY` bla
 | `TUTOR_API_URL` | Optional OpenAI-compatible chat-completions endpoint. Defaults to `https://api.openai.com/v1/chat/completions`. |
 | `TUTOR_MODEL` | Optional provider model name. Defaults to `gpt-4o-mini`. |
 
-The server tutor bounds question size, history, response length, and request time. It passes the selected step, guide excerpts, student context, available materials, observations, and completed step IDs to the provider. Provider errors are shown without hiding the guide. Student content is treated as untrusted reference data; tutor replies render as text, not HTML. Demo mode only recognizes a few scripted question patterns and does not claim to understand arbitrary prompts.
+The server tutor bounds question size, history, response length, and request time. AI-provider requests are also limited to 30 per rolling minute per Node server process; a `429` response includes `Retry-After`. This in-memory limit is a basic deployment safeguard, not a shared quota across multiple server instances. The tutor passes the selected step, design assumptions, relevant guide excerpts, student context, available materials, observations, and completed step IDs to the provider. Provider errors are shown without hiding the guide. Student content is treated as untrusted reference data; tutor replies render as text, not HTML. Demo mode only recognizes a few scripted question patterns and does not claim to understand arbitrary prompts.
 
 ## Verify
 
@@ -46,7 +46,7 @@ npm run typecheck
 npm run build
 ```
 
-Tests cover guide IDs and cross-references, the three circuit mappings, explicit progress updates, corrupted/outdated local saves, demo labeling, bounded tutor requests, guide/context construction, and provider rate-limit handling.
+Tests cover guide IDs and cross-references, the fixed/moving gripper design, three circuit mappings, explicit progress updates, corrupted/outdated local saves, demo labeling, bounded tutor requests, guide/context construction, and provider/server rate-limit handling.
 
 ## Reference design and safety
 

@@ -86,6 +86,7 @@ test("AI request contains the current guide context and returns provider text", 
     assert.equal(requestBody.messages.length, 10);
     assert.match(requestBody.messages[0].content, /untrusted data/);
     assert.match(requestBody.messages[0].content, /step-07/);
+    assert.match(requestBody.messages[0].content, /moving G1 finger/i);
     assert.match(requestBody.messages[0].content, /connection feels loose/);
   } finally {
     globalThis.fetch = originalFetch;
@@ -127,6 +128,38 @@ test("invalid provider responses and network errors are handled safely", async (
     const unavailable = await POST(new Request("http://localhost/api/tutor", { method: "POST", body: JSON.stringify({ question: "Help" }) }));
     assert.equal(unavailable.status, 502);
     assert.match((await unavailable.json()).error, /timed out|could not be reached/i);
+  } finally {
+    globalThis.fetch = originalFetch;
+    if (originalKey === undefined) delete process.env.TUTOR_API_KEY;
+    else process.env.TUTOR_API_KEY = originalKey;
+  }
+});
+
+test("AI tutor calls are capped per server process and return Retry-After", async () => {
+  const originalKey = process.env.TUTOR_API_KEY;
+  const originalFetch = globalThis.fetch;
+  let providerCalls = 0;
+  process.env.TUTOR_API_KEY = "test-key";
+  globalThis.fetch = (async () => {
+    providerCalls += 1;
+    return Response.json({ choices: [{ message: { content: "Try a gentle check." } }] });
+  }) as typeof fetch;
+  try {
+    let limited: Response | undefined;
+    for (let index = 0; index < 40; index += 1) {
+      const response = await POST(new Request("http://localhost/api/tutor", {
+        method: "POST",
+        body: JSON.stringify({ question: "Help", stepId: "step-01" }),
+      }));
+      if (response.status === 429) {
+        limited = response;
+        break;
+      }
+      assert.equal(response.status, 200);
+    }
+    assert.ok(limited);
+    assert.ok(Number(limited.headers.get("Retry-After")) >= 1);
+    assert.ok(providerCalls <= 30);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalKey === undefined) delete process.env.TUTOR_API_KEY;

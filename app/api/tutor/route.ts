@@ -17,6 +17,16 @@ type TutorBody = {
 };
 
 const MAX_QUESTION = 1200;
+const AI_REQUEST_WINDOW_MS = 60_000;
+const MAX_AI_REQUESTS_PER_WINDOW = 30;
+const aiRequestTimes: number[] = [];
+
+function consumeAiRequest(now = Date.now()): boolean {
+  while (aiRequestTimes.length && aiRequestTimes[0] <= now - AI_REQUEST_WINDOW_MS) aiRequestTimes.shift();
+  if (aiRequestTimes.length >= MAX_AI_REQUESTS_PER_WINDOW) return false;
+  aiRequestTimes.push(now);
+  return true;
+}
 
 export async function GET() {
   return Response.json({ mode: process.env.TUTOR_API_KEY ? "ai" : "demo" });
@@ -72,7 +82,10 @@ export async function POST(request: Request) {
   const step = getStep(typeof body.stepId === "string" ? body.stepId : "");
   const context = {
     project: `${GUIDE.title} version ${GUIDE.version}; ${GUIDE.validationStatus}`,
-    step: { id: step.id, title: step.title, objective: step.objective, actions: step.actions, checkpoint: step.checkpoint, theory: step.theory },
+    designAssumptions: GUIDE.designAssumptions,
+    movements: GUIDE.movements,
+    parts: GUIDE.parts,
+    step: { id: step.id, phase: step.phase, title: step.title, objective: step.objective, actions: step.actions, checkpoint: step.checkpoint, theory: step.theory, diagram: step.diagram },
     circuits: GUIDE.circuits,
     troubleshooting: GUIDE.troubleshooting,
     studentContext: body.context,
@@ -85,6 +98,13 @@ export async function POST(request: Request) {
   };
   const apiKey = process.env.TUTOR_API_KEY;
   if (!apiKey) return Response.json({ reply: demoReply(body.question, language, step.id), mode: "demo" });
+  if (!consumeAiRequest()) {
+    const retryAfter = Math.max(1, Math.ceil((aiRequestTimes[0] + AI_REQUEST_WINDOW_MS - Date.now()) / 1000));
+    return Response.json(
+      { error: "The tutor is busy. Please wait a moment and try again." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } },
+    );
+  }
 
   const history = Array.isArray(body.history)
     ? body.history.slice(-8).filter((item): item is { role: "student" | "tutor"; text: string } =>

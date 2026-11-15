@@ -259,7 +259,7 @@ export function Workbench() {
           <ul>{GUIDE.designAssumptions.map((assumption, index) => <li key={assumption}>{language === "vi" ? [
             "Hình vẽ chỉ mang tính sơ đồ, không theo tỷ lệ. Kích thước là điểm khởi đầu, chưa phải mẫu đã thử nghiệm.",
             "Tay dùng xi-lanh không kim 10 mL điều khiển bằng tay và nước; không có động cơ, điện tử hay điều khiển tự động.",
-            "Ba mạch riêng điều khiển nâng vai, gập khuỷu và kẹp đơn giản. Đế không xoay.",
+            "Ba mạch riêng điều khiển nâng vai, gập khuỷu và kẹp có một ngón cố định, một ngón xoay bằng thủy lực. Đế không xoay.",
             "Dùng xi-lanh và ống cùng cỡ. Thể tích danh định không cho biết diện tích pít-tông; không có tải trọng nào được bảo đảm.",
             "Độ dày bìa, đầu nối xi-lanh và hình học liên kết khác nhau. Lắp thử và điều chỉnh chốt trước khi đục lỗ cuối.",
           ][index] : assumption}</li>)}</ul>
