@@ -26,7 +26,7 @@ export default function Diagram({ id, lang }: { id: string; lang: Language }) {
         <path d="M430 70 L455 150" stroke="#8c6438" strokeWidth="15"/><text x="460" y="145">J1</text>
         <path d="M418 73 L390 145" stroke="#c99353" strokeWidth="15"/><text x="350" y="150">J2</text>
         <circle cx="165" cy="118" r="7" fill="#243f43"/><text x="140" y="102">P1</text><circle cx="418" cy="73" r="7" fill="#243f43"/><text x="400" y="52">P2</text>
-        <path d="M215 170 L250 108" stroke="#087e82" strokeWidth="12"/><circle cx="215" cy="170" r="5" fill="#243f43"/><circle cx="250" cy="108" r="5" fill="#243f43"/><text x="195" y="190">M1a</text><text x="235" y="145">M1b · X1</text>
+        <path d="M200 200 L215 168 L230 200 Z" fill="#e9c99b" stroke="#8c6438" strokeWidth="2"/><path d="M215 170 L250 108" stroke="#087e82" strokeWidth="12"/><circle cx="215" cy="170" r="5" fill="#243f43"/><circle cx="250" cy="108" r="5" fill="#243f43"/><text x="190" y="195">M1a</text><text x="235" y="145">M1b · X1</text>
         <path d="M330 88 L395 110" stroke="#b9631c" strokeWidth="9"/><text x="300" y="125">M2a · X2 · M2b</text>
         <path d="M205 50 Q250 15 300 30" fill="none" stroke="#087e82" strokeWidth="3" markerEnd="url(#arrow)"/><path d="M370 165 Q400 185 430 170" fill="none" stroke="#087e82" strokeWidth="3" markerEnd="url(#arrow)"/>
       </>}

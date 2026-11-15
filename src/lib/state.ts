@@ -29,8 +29,8 @@ export function parseWork(raw: string | null): Work | null {
     return {
       ...base, ...x, context: { ...base.context, ...x.context },
       currentStep: project.steps.some(s => s.id === x.currentStep) ? x.currentStep : base.currentStep,
-      completed: x.completed.filter((id: string) => project.steps.some(s => s.id === id)),
-      checkedMaterials: x.checkedMaterials.filter((id: string) => project.materials.some(m => m.id === id)),
+      completed: [...new Set<string>(x.completed.filter((id: string) => project.steps.some(s => s.id === id)))],
+      checkedMaterials: [...new Set<string>(x.checkedMaterials.filter((id: string) => project.materials.some(m => m.id === id)))],
       results: { ...base.results, ...x.results },
     };
   } catch { return null; }
